@@ -8,8 +8,7 @@ square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','45
 unitlist = row_units + column_units + square_units
 
 # TODO: Update the unit list to add the new diagonal units
-unitlist = unitlist
-
+unitlist = unitlist +  ['A9', 'B8', 'C7', 'D6', 'E5', 'F4', 'G3', 'H2', 'I1'] + ['A9', 'B8', 'C7', 'D6', 'E5', 'F4', 'G3', 'H2', 'I1']
 
 # Must be called after all units (including diagonals) are added to the unitlist
 units = extract_units(unitlist, boxes)
@@ -54,8 +53,22 @@ def naked_twins(values):
     https://github.com/udacity/artificial-intelligence/blob/master/Projects/1_Sudoku/pseudocode.md
     """
     # TODO: Implement this function!
-    raise NotImplementedError
-
+    values_copy  = values.copy()
+    for a in boxes:
+        peers_of_a = peers[a]
+        value_of_a = values_copy[a]
+        for b in peers_of_a:
+            if (values_copy[b] == value_of_a) & ( len(value_of_a) == 2):
+                intersection_of_a_b = list(set(peers).intersection( set( peers[b])))
+                for intersect in intersection_of_a_b:
+                    for digit in value_of_a:
+                        values_copy[intersect].replace(digit,'')
+    return values_copy
+                    
+                    
+                    
+                    
+                
 
 def eliminate(values):
     """Apply the eliminate strategy to a Sudoku puzzle
@@ -73,8 +86,16 @@ def eliminate(values):
     dict
         The values dictionary with the assigned values eliminated from peers
     """
-    # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+    solved_boxes = [b for b in boxes if len(values[b]) == 1 ]
+    for solved in solved_boxes:
+        peers_of_solved = peers[solved]
+        for p in peers_of_solved:
+            values[p] = values[p].replace(values[solved],'')
+    
+    
+    return values
+            
+        
 
 
 def only_choice(values):
@@ -98,8 +119,12 @@ def only_choice(values):
     You should be able to complete this function by copying your code from the classroom
     """
     # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
-
+    
+    for unit in unitlist:
+        for d in '123456789':
+            dplaces = [b for b in unit if d in values[b]]
+            if len(dplaces) == 1:
+                values[dplaces[0]] = d
 
 def reduce_puzzle(values):
     """Reduce a Sudoku puzzle by repeatedly applying all constraint strategies
